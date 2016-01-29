@@ -1,0 +1,11 @@
+dask[array]
+jupyter
+matplotlib
+networkx
+nose
+numpy
+pillow
+scikit-image
+scikit-learn
+scipy
+six
