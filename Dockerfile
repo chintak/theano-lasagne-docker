@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 
-
 WORKDIR /tmp
 COPY requirements.txt .
 RUN pip install --upgrade pip && \
