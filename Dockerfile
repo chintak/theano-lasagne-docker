@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y \
   software-properties-common python-software-properties \
 && add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe multiverse" \
 && add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates universe multiverse" \
-&& apt-get update && apt-get install -y \
+&& apt-get update && apt-get install -y --force-yes \
   build-essential \
   checkinstall \
   cmake \
