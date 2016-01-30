@@ -63,7 +63,7 @@ COPY requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt \
 && pip install -r https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
 && pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git \
-&& rm -rf *
+&& rm -rf /tmp/*
 
 EXPOSE 8888
 # Build opencv
