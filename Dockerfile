@@ -44,8 +44,10 @@ RUN apt-get update && apt-get install -y \
   python \
   python-dev \
   python-pip \
+  tmux \
   unzip \
   v4l-utils \
+  vim \
   wget \
   yasm \
 && apt-get clean \
