@@ -7,6 +7,7 @@ RUN apt-get update && apt-get install -y \
   ant \
   cmake \
   default-jdk \
+  gfortran \
   git \
   libatlas-base-dev \
   libatlas-dev \
