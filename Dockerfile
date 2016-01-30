@@ -3,9 +3,11 @@ FROM chintak/cuda-docker:7.5
 MAINTAINER Chintak Sheth <chintaksheth@gmail.com>
 
 # Install wget and build-essential
-RUN add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe multiverse" && \
-  add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates universe multiverse" && \
-  apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y && \
+  software-properties-common python-software-properties \
+&& add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty universe multiverse" \
+&& add-apt-repository "deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates universe multiverse" \
+&& apt-get update && apt-get install -y \
   build-essential \
   checkinstall \
   cmake \
@@ -72,3 +74,13 @@ RUN cd /tmp && \
   echo "export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc && \
   cd .. && \
   rm -r opencv*
+
+# Install caffe
+RUN cd /root && git clone https://github.com/NVIDIA/caffe.git && cd /root/caffe && \
+  git checkout tags/v0.13.2 -b v0.13.2 && \
+  make -j8 all && \
+  make -j8 py && \
+  echo "export CAFFE_HOME=/root/caffe" >> /root/.bashrc && \
+  echo "export LD_LIBRARY_PATH=$CAFFE_HOME/lib:$LD_LIBRARY_PATH" >> /root/.bashrc && \
+  echo "export PYTHONPATH=$CAFFE_HOME/python:$PYTHONPATH" >> /root/.bashrc && \
+  echo "export PATH=$CAFFE_HOME/tools/:$PATH" >> /root/.bashrc
