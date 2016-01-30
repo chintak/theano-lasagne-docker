@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
   checkinstall \
   cmake \
   gfortran \
+  git \
   libatlas-base-dev \
   libatlas-dev \
   libatlas3gf-base \
