@@ -64,7 +64,7 @@ COPY requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt \
 && pip install -r https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
 && pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git \
-&& rm -rf *
+&& rm -rf /tmp/*
 
 EXPOSE 8888
 # Build opencv
@@ -72,7 +72,7 @@ RUN cd /tmp \
 && wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/opencv-2.4.9.zip \
 && unzip opencv-2.4.9.zip && rm opencv-2.4.9.zip* \
 && cd opencv-2.4.9 && mkdir build && cd build \
-&& cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_OPENGL=ON -D WITH_VTK=ON .. \
+&& cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=ON .. \
 && make -j4 && sudo make install \
 && sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig \
 && echo "export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc \
