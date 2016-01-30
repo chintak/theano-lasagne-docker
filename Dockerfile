@@ -68,24 +68,31 @@ RUN pip install -r /tmp/requirements.txt \
 
 EXPOSE 8888
 # Build opencv
-RUN cd /tmp \
-&& wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/opencv-2.4.9.zip \
+WORKDIR /tmp
+RUN wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/opencv-2.4.9.zip \
 && unzip opencv-2.4.9.zip && rm opencv-2.4.9.zip* \
-&& cd opencv-2.4.9 && mkdir build && cd build \
-&& cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=ON .. \
-&& make -j4 && sudo make install \
-&& sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig \
-&& echo "export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc \
-&& cd .. \
-&& rm -r opencv*
+&& mkdir opencv-2.4.9/build
+
+WORKDIR opencv-2.4.9/build
+RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=ON .. \
+&& make -j4 && sudo make install
+RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig \
+&& echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> /root/.bashrc \
+&& echo "export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc
+
+WORKDIR /tmp
+RUN rm -r opencv*
 
 # Install caffe
+WORKDIR /root
+RUN git clone https://github.com/NVIDIA/caffe.git
+WORKDIR caffe
+
 ENV CAFFE_VERSION 0.13.2
-RUN cd /root && git clone https://github.com/NVIDIA/caffe.git && cd /root/caffe \
-&& git checkout tags/v${CAFFE_VERSION} -b v${CAFFE_VERSION} \
+RUN git pull && git checkout tags/v${CAFFE_VERSION} -b v${CAFFE_VERSION} \
 && make -j8 all \
-&& make -j8 py \
-&& echo "export CAFFE_HOME=/root/caffe" >> /root/.bashrc \
+&& make -j8 py
+RUN echo "export CAFFE_HOME=/root/caffe" >> /root/.bashrc \
 && echo "export LD_LIBRARY_PATH=$CAFFE_HOME/lib:$LD_LIBRARY_PATH" >> /root/.bashrc \
 && echo "export PYTHONPATH=$CAFFE_HOME/python:$PYTHONPATH" >> /root/.bashrc \
 && echo "export PATH=$CAFFE_HOME/tools/:$PATH" >> /root/.bashrc
