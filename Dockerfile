@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
   libatlas3gf-base \
   libavcodec-dev \
   libavformat-dev \
+  libboost-all-dev \
   libblas-dev \
   libdc1394-22-dev \
   libeigen3-dev \
@@ -75,24 +76,29 @@ RUN wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/o
 
 WORKDIR opencv-2.4.9/build
 RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_CUDA=OFF .. \
-&& make -j4 && sudo make install
+&& make -j8 && make -j8 install
 RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig \
 && echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> /root/.bashrc \
 && echo "export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc
 
 WORKDIR /tmp
-RUN rm -r opencv*
+RUN rm -rf opencv*
 
 # Install caffe
 WORKDIR /root
-RUN git clone https://github.com/NVIDIA/caffe.git
-WORKDIR caffe
-
 ENV CAFFE_VERSION 0.13.2
-RUN git pull && git checkout tags/v${CAFFE_VERSION} -b v${CAFFE_VERSION} \
+RUN wget https://github.com/NVIDIA/caffe/archive/v${CAFFE_VERSION}.zip \
+&& unzip v${CAFFE_VERSION}.zip \
+&& rm v${CAFFE_VERSION}.zip
+WORKDIR caffe-${CAFFE_VERSION}
+
+RUN cp Makefile.config.example Makefile.config \
 && make -j8 all \
 && make -j8 py
 RUN echo "export CAFFE_HOME=/root/caffe" >> /root/.bashrc \
 && echo "export LD_LIBRARY_PATH=$CAFFE_HOME/lib:$LD_LIBRARY_PATH" >> /root/.bashrc \
 && echo "export PYTHONPATH=$CAFFE_HOME/python:$PYTHONPATH" >> /root/.bashrc \
 && echo "export PATH=$CAFFE_HOME/tools/:$PATH" >> /root/.bashrc
+
+WORKDIR /root
+CMD ["/bin/bash"]
