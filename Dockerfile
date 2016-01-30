@@ -74,7 +74,7 @@ RUN wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/o
 && mkdir opencv-2.4.9/build
 
 WORKDIR opencv-2.4.9/build
-RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=ON .. \
+RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_CUDA=OFF .. \
 && make -j4 && sudo make install
 RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig \
 && echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> /root/.bashrc \
