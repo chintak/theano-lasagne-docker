@@ -80,7 +80,7 @@ RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig \
 && echo "export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc
 
 WORKDIR /tmp
-RUN rm -r opencv*
+RUN rm -rf opencv*
 
 # Install caffe
 WORKDIR /root
