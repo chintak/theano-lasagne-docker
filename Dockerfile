@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y \
   libatlas3gf-base \
   libavcodec-dev \
   libavformat-dev \
-  libboost-all-dev \
   libblas-dev \
+  libboost-all-dev \
   libdc1394-22-dev \
   libeigen3-dev \
   libfaac-dev \
