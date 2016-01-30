@@ -1,0 +1,8 @@
+dask[array]
+jupyter
+networkx
+nose
+pillow
+scikit-image
+scikit-learn
+six
