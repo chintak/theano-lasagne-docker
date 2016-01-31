@@ -23,17 +23,21 @@ RUN apt-get update && apt-get install -y \
   libdc1394-22-dev \
   libeigen3-dev \
   libfaac-dev \
+  libgflags-dev \
+  libgoogle-glog-dev \
   libgstreamer-plugins-base0.10-dev \
   libgstreamer0.10-dev \
   libgtk2.0-dev \
   libjasper-dev \
   libjpeg-dev \
+  libleveldb-dev libsnappy-dev liblmdb-dev libhdf5-serial-dev \
   libmp3lame-dev \
   libopenblas-dev \
   libopencore-amrnb-dev \
   libopencore-amrwb-dev \
   libopencv-dev \
-  libqt4-dev \
+  libopenexr-dev \
+  libprotobuf-dev protobuf-compiler \
   libswscale-dev \
   libtbb-dev \
   libtheora-dev \
