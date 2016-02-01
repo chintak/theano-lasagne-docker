@@ -70,15 +70,6 @@ COPY requirements-dep.txt /tmp/
 RUN pip install --upgrade pip && \
   pip install -r /tmp/requirements-dep.txt
 
-# Build theano, nolearn and lasagne
-COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt
-RUN wget -O req.txt https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
-&& pip install -r req.txt \
-&& pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git \
-&& rm -rf /tmp/*
-
-EXPOSE 8888
 # Build opencv
 WORKDIR /tmp
 RUN wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/opencv-2.4.9.zip \
@@ -107,6 +98,16 @@ RUN cp Makefile.config.example Makefile.config \
 && make -j8 py
 ENV CAFFE_HOME /root/caffe-0.13.2
 
+# Build theano, nolearn and lasagne
+COPY requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt
+RUN wget -O req.txt https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
+&& pip install -r req.txt
+RUN pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git \
+&& rm -rf /tmp/*
+
+EXPOSE 8888
+
 RUN echo "export CAFFE_HOME=$CAFFE_HOME" >> /root/.bashrc \
 && echo "export CUDA_HOME=$CUDA_HOME" >> /root/.bashrc \
 && echo "export LD_LIBRARY_PATH=\$CAFFE_HOME/lib:\$CUDA_HOME/lib64:\$LD_LIBRARY_PATH" >> /root/.bashrc \
@@ -116,3 +117,4 @@ RUN echo "export CAFFE_HOME=$CAFFE_HOME" >> /root/.bashrc \
 
 WORKDIR /root
 CMD ["/bin/bash"]
+
