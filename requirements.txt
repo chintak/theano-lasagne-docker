@@ -6,3 +6,6 @@ pillow
 scikit-image
 scikit-learn
 six
+pyopenssl
+ndg-httpsclient
+pyasn1
