@@ -99,12 +99,12 @@ RUN cp Makefile.config.example Makefile.config \
 ENV CAFFE_HOME /root/caffe-0.13.2
 
 # Build theano, nolearn and lasagne
+WORKDIR /root
 COPY requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt
 RUN wget -O req.txt https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
 && pip install -r req.txt
-RUN pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git \
-&& rm -rf /tmp/*
+RUN pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git
 
 EXPOSE 8888
 
