@@ -27,7 +27,6 @@ RUN apt-get update && apt-get install -y \
   libgoogle-glog-dev \
   libgstreamer-plugins-base0.10-dev \
   libgstreamer0.10-dev \
-  libgtk2.0-dev \
   libjasper-dev \
   libjpeg-dev \
   libleveldb-dev libsnappy-dev liblmdb-dev libhdf5-serial-dev \
@@ -66,8 +65,8 @@ RUN pip install --upgrade pip && \
   pip install -r /tmp/requirements-dep.txt
 # Build theano, nolearn and lasagne
 COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt \
-&& pip install -r https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
+RUN pip install -r /tmp/requirements.txt
+RUN pip install -r https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
 && pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git \
 && rm -rf /tmp/*
 
@@ -79,7 +78,7 @@ RUN wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/o
 && mkdir opencv-2.4.9/build
 
 WORKDIR opencv-2.4.9/build
-RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_CUDA=OFF .. \
+RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=OFF -D WITH_CUDA=OFF .. \
 && make -j8 && make -j8 install
 RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig \
 && echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> /root/.bashrc \
