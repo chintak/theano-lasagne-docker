@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y \
   libdc1394-22-dev \
   libeigen3-dev \
   libfaac-dev \
+  libffi-dev \
   libgflags-dev \
   libgoogle-glog-dev \
   libgstreamer-plugins-base0.10-dev \
@@ -50,6 +51,7 @@ RUN apt-get update && apt-get install -y \
   python \
   python-dev \
   python-pip \
+  openssl \
   tmux \
   unzip \
   v4l-utils \
