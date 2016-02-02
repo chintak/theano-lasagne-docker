@@ -22,17 +22,22 @@ RUN apt-get update && apt-get install -y \
   libdc1394-22-dev \
   libeigen3-dev \
   libfaac-dev \
+  libffi-dev \
+  libgflags-dev \
+  libgoogle-glog-dev \
   libgstreamer-plugins-base0.10-dev \
   libgstreamer0.10-dev \
-  libgtk2.0-dev \
   libjasper-dev \
   libjpeg-dev \
+  libleveldb-dev libsnappy-dev liblmdb-dev libhdf5-serial-dev \
   libmp3lame-dev \
   libopenblas-dev \
   libopencore-amrnb-dev \
   libopencore-amrwb-dev \
   libopencv-dev \
-  libqt4-dev \
+  libopenexr-dev \
+  libprotobuf-dev protobuf-compiler \
+  libssl-dev \
   libswscale-dev \
   libtbb-dev \
   libtheora-dev \
@@ -59,14 +64,7 @@ RUN apt-get update && apt-get install -y \
 COPY requirements-dep.txt /tmp/
 RUN pip install --upgrade pip && \
   pip install -r /tmp/requirements-dep.txt
-# Build theano, nolearn and lasagne
-COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt \
-&& pip install -r https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
-&& pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git \
-&& rm -rf /tmp/*
 
-EXPOSE 8888
 # Build opencv
 WORKDIR /tmp
 RUN wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/opencv-2.4.9.zip \
@@ -74,11 +72,9 @@ RUN wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/o
 && mkdir opencv-2.4.9/build
 
 WORKDIR opencv-2.4.9/build
-RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=ON -D WITH_CUDA=OFF .. \
+RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=OFF -D WITH_GTK=OFF -D WITH_CUDA=OFF .. \
 && make -j8 && make -j8 install
-RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig \
-&& echo "export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH" >> /root/.bashrc \
-&& echo "export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc
+RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig
 
 WORKDIR /tmp
 RUN rm -rf opencv*
@@ -91,13 +87,29 @@ RUN wget https://github.com/NVIDIA/caffe/archive/v${CAFFE_VERSION}.zip \
 && rm v${CAFFE_VERSION}.zip
 WORKDIR caffe-${CAFFE_VERSION}
 
+RUN for req in $(cat python/requirements.txt); do pip install $req; done
 RUN cp Makefile.config.example Makefile.config \
+&& echo "USE_CPU := 1" >> Makefile.config \
 && make -j8 all \
 && make -j8 py
-RUN echo "export CAFFE_HOME=/root/caffe" >> /root/.bashrc \
-&& echo "export LD_LIBRARY_PATH=$CAFFE_HOME/lib:$LD_LIBRARY_PATH" >> /root/.bashrc \
-&& echo "export PYTHONPATH=$CAFFE_HOME/python:$PYTHONPATH" >> /root/.bashrc \
-&& echo "export PATH=$CAFFE_HOME/tools/:$PATH" >> /root/.bashrc
+ENV CAFFE_HOME /root/caffe-$CAFFE_VERSION
+
+# Build theano, nolearn and lasagne
+WORKDIR /root
+COPY requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt
+RUN wget -O req.txt https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
+&& pip install -r req.txt
+RUN pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git
+
+EXPOSE 8888
+
+RUN echo "export CAFFE_HOME=$CAFFE_HOME" >> /root/.bashrc \
+&& echo "export CUDA_HOME=$CUDA_HOME" >> /root/.bashrc \
+&& echo "export LD_LIBRARY_PATH=\$CAFFE_HOME/lib:\$CUDA_HOME/lib64:\$LD_LIBRARY_PATH" >> /root/.bashrc \
+&& echo "export PYTHONPATH=\$CAFFE_HOME/python:\$PYTHONPATH" >> /root/.bashrc \
+&& echo "export PATH=\$CAFFE_HOME/tools/:\$PATH" >> /root/.bashrc \
+&& echo "export PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc
 
 WORKDIR /root
 CMD ["/bin/bash"]
