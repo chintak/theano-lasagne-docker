@@ -65,14 +65,23 @@ COPY requirements-dep.txt /tmp/
 RUN pip install --upgrade pip && \
   pip install -r /tmp/requirements-dep.txt
 
-# Build opencv
-WORKDIR /tmp
-RUN wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/opencv-2.4.9.zip \
-&& unzip opencv-2.4.9.zip && rm opencv-2.4.9.zip* \
-&& mkdir opencv-2.4.9/build
+RUN apt-get update && apt-get install -y \
+  libgtk2.0-dev \
+&& apt-get clean \
+&& rm -rf /var/lib/apt/lists/*
 
-WORKDIR opencv-2.4.9/build
-RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=OFF -D WITH_GTK=OFF -D WITH_CUDA=OFF .. \
+# Build opencv
+ENV OPENCV_VERSION 2.4.10.4
+WORKDIR /tmp
+RUN wget -O opencv.zip https://github.com/Itseez/opencv/archive/$OPENCV_VERSION.zip \
+&& unzip opencv.zip && rm opencv.zip* \
+&& mkdir opencv-$OPENCV_VERSION/build
+
+RUN apt-get update && apt-get install -y \
+  libqt4-dev
+
+WORKDIR opencv-$OPENCV_VERSION/build
+RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=OFF -D WITH_CUDA=OFF .. \
 && make -j8 && make -j8 install
 RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig
 
