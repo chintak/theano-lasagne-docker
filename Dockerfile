@@ -1,4 +1,4 @@
-FROM python:2.7.10
+FROM ubuntu:14.04
 MAINTAINER Chintak Sheth <chintaksheth@gmail.com>
 
 # Install wget and build-essential
@@ -23,8 +23,7 @@ RUN apt-get update && apt-get install -y \
   libeigen3-dev \
   libfaac-dev \
   libffi-dev \
-  libgflags-dev \
-  libgoogle-glog-dev \
+  libgflags-dev libgoogle-glog-dev \
   libgstreamer-plugins-base0.10-dev \
   libgstreamer0.10-dev \
   libjasper-dev \
@@ -47,6 +46,7 @@ RUN apt-get update && apt-get install -y \
   libx264-dev \
   libxine2-dev \
   libxvidcore-dev \
+  openssl \
   pkg-config \
   python \
   python-dev \
@@ -65,11 +65,6 @@ COPY requirements-dep.txt /tmp/
 RUN pip install --upgrade pip && \
   pip install -r /tmp/requirements-dep.txt
 
-RUN apt-get update && apt-get install -y \
-  libgtk2.0-dev \
-&& apt-get clean \
-&& rm -rf /var/lib/apt/lists/*
-
 # Build opencv
 ENV OPENCV_VERSION 2.4.10.4
 WORKDIR /tmp
@@ -77,11 +72,8 @@ RUN wget -O opencv.zip https://github.com/Itseez/opencv/archive/$OPENCV_VERSION.
 && unzip opencv.zip && rm opencv.zip* \
 && mkdir opencv-$OPENCV_VERSION/build
 
-RUN apt-get update && apt-get install -y \
-  libqt4-dev
-
-WORKDIR opencv-$OPENCV_VERSION/build
-RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=OFF -D WITH_CUDA=OFF .. \
+WORKDIR opencv-2.4.9/build
+RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=OFF -D WITH_GTK=OFF -D WITH_CUDA=OFF .. \
 && make -j8 && make -j8 install
 RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig
 
@@ -97,11 +89,11 @@ RUN wget https://github.com/NVIDIA/caffe/archive/v${CAFFE_VERSION}.zip \
 WORKDIR caffe-${CAFFE_VERSION}
 
 RUN for req in $(cat python/requirements.txt); do pip install $req; done
-RUN cp Makefile.config.example Makefile.config \
-&& echo "USE_CPU := 1" >> Makefile.config \
-&& make -j8 all \
+COPY Makefile.config ./
+
+RUN make -j8 all \
 && make -j8 py
-ENV CAFFE_HOME /root/caffe-$CAFFE_VERSION
+ENV CAFFE_HOME /root/caffe-0.13.2
 
 # Build theano, nolearn and lasagne
 WORKDIR /root
@@ -114,8 +106,7 @@ RUN pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.
 EXPOSE 8888
 
 RUN echo "export CAFFE_HOME=$CAFFE_HOME" >> /root/.bashrc \
-&& echo "export CUDA_HOME=$CUDA_HOME" >> /root/.bashrc \
-&& echo "export LD_LIBRARY_PATH=\$CAFFE_HOME/lib:\$CUDA_HOME/lib64:\$LD_LIBRARY_PATH" >> /root/.bashrc \
+&& echo "export LD_LIBRARY_PATH=\$CAFFE_HOME/lib:\$LD_LIBRARY_PATH" >> /root/.bashrc \
 && echo "export PYTHONPATH=\$CAFFE_HOME/python:\$PYTHONPATH" >> /root/.bashrc \
 && echo "export PATH=\$CAFFE_HOME/tools/:\$PATH" >> /root/.bashrc \
 && echo "export PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc
