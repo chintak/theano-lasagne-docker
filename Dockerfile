@@ -72,7 +72,7 @@ RUN wget -O opencv.zip https://github.com/Itseez/opencv/archive/$OPENCV_VERSION.
 && unzip opencv.zip && rm opencv.zip* \
 && mkdir opencv-$OPENCV_VERSION/build
 
-WORKDIR opencv-2.4.9/build
+WORKDIR opencv-$OPENCV_VERSION/build
 RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=OFF -D WITH_GTK=OFF -D WITH_CUDA=OFF .. \
 && make -j8 && make -j8 install
 RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig
