@@ -1,0 +1,8 @@
+[global]
+floatX = float32
+device = cpu
+openmp = True
+exception_verbosity = high
+
+[nvcc]
+fastmath = True

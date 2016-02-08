@@ -109,7 +109,13 @@ RUN echo "export CAFFE_HOME=$CAFFE_HOME" >> /root/.bashrc \
 && echo "export LD_LIBRARY_PATH=\$CAFFE_HOME/lib:\$LD_LIBRARY_PATH" >> /root/.bashrc \
 && echo "export PYTHONPATH=\$CAFFE_HOME/python:\$PYTHONPATH" >> /root/.bashrc \
 && echo "export PATH=\$CAFFE_HOME/tools/:\$PATH" >> /root/.bashrc \
-&& echo "export PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> ~/.bashrc
+&& echo "export PKG_CONFIG_PATH=\$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig" >> /root/.bashrc
+&& echo "alias new='tmux new -s'" >> /root/.bashrc
+&& echo "alias att='tmux a -t'" >> /root/.bashrc
+
+COPY .theanorc /root/
+COPY .vimrc /root/
+COPY .tmux.conf /root/
 
 WORKDIR /root
 CMD ["/bin/bash"]
