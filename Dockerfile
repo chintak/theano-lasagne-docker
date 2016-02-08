@@ -70,15 +70,12 @@ ENV OPENCV_VERSION 2.4.10.4
 WORKDIR /tmp
 RUN wget -O opencv.zip https://github.com/Itseez/opencv/archive/$OPENCV_VERSION.zip \
 && unzip opencv.zip && rm opencv.zip* \
-&& mkdir opencv-$OPENCV_VERSION/build
-
-WORKDIR opencv-$OPENCV_VERSION/build
-RUN cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=OFF -D WITH_GTK=OFF -D WITH_CUDA=OFF .. \
-&& make -j8 && make -j8 install
-RUN sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig
-
-WORKDIR /tmp
-RUN rm -rf opencv*
+&& mkdir opencv-$OPENCV_VERSION/build \
+&& cd opencv-$OPENCV_VERSION/build \
+&& cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D WITH_QT=OFF -D WITH_GTK=OFF -D WITH_CUDA=OFF .. \
+&& make -j8 && make -j8 install \
+&& sh -c 'echo "/usr/local/lib" >> /etc/ld.so.conf.d/opencv.conf' && ldconfig \
+&& rm -rf /tmp/opencv*
 
 # Install caffe
 WORKDIR /root
@@ -99,8 +96,8 @@ ENV CAFFE_HOME /root/caffe-0.13.2
 WORKDIR /root
 COPY requirements.txt /tmp/
 RUN pip install -r /tmp/requirements.txt
-RUN wget -O req.txt https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
-&& pip install -r req.txt
+RUN wget -O /tmp/req.txt https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
+&& pip install -r /tmp/req.txt
 RUN pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git
 
 EXPOSE 8888
@@ -116,6 +113,8 @@ RUN echo "export CAFFE_HOME=$CAFFE_HOME" >> /root/.bashrc \
 COPY .theanorc /root/
 COPY .vimrc /root/
 COPY .tmux.conf /root/
+# Remove caches etc
+RUN rm -rf /root/.cache*
 
 WORKDIR /root
 CMD ["/bin/bash"]
