@@ -92,14 +92,6 @@ RUN make -j8 all \
 && make -j8 py
 ENV CAFFE_HOME /root/caffe-0.13.2
 
-# Build theano, nolearn and lasagne
-WORKDIR /root
-COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt
-RUN wget -O /tmp/req.txt https://raw.githubusercontent.com/dnouri/nolearn/master/requirements.txt \
-&& pip install -r /tmp/req.txt
-RUN pip install git+https://github.com/dnouri/nolearn.git@master#egg=nolearn==0.7.git
-
 EXPOSE 8888
 
 RUN echo "export CAFFE_HOME=$CAFFE_HOME" >> /root/.bashrc \
@@ -110,7 +102,6 @@ RUN echo "export CAFFE_HOME=$CAFFE_HOME" >> /root/.bashrc \
 && echo "alias new='tmux new -s'" >> /root/.bashrc \
 && echo "alias att='tmux a -t'" >> /root/.bashrc
 
-COPY .theanorc /root/
 COPY .vimrc /root/
 COPY .tmux.conf /root/
 # Remove caches etc
