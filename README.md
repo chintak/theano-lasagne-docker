@@ -1,2 +1,2 @@
 # cuda-theano-lasagne-docker
-Dockerfile for Lasagne with Cuda support.
+Dockerfile for installing Lasagne on CPU without Cuda support.
